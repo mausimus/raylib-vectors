@@ -3,10 +3,11 @@
 #include "stdafx.h"
 #include "VectorBatch.h"
 
-constexpr float CHAR_SCALE = 0.0025f;
+constexpr float CHAR_SCALE = 0.02f;
 constexpr int CHAR_RAW_MIDPOINT = 9;
-constexpr float CHAR_KERNING = 0.01f;
-constexpr float CHAR_MIDPOINT = CHAR_RAW_MIDPOINT * CHAR_KERNING;
+constexpr float CHAR_HEIGHT = 2 * CHAR_RAW_MIDPOINT * CHAR_SCALE;
+constexpr float CHAR_KERNING = 0.1f;
+constexpr float CHAR_MIDPOINT = CHAR_RAW_MIDPOINT * CHAR_SCALE;
 
 class Assets
 {
@@ -17,6 +18,7 @@ public:
     Assets();
     void Load();
     void Unload();
+    void Render(float thick);
 
 private:
     void GenerateChars();

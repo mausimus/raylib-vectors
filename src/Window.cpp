@@ -21,15 +21,15 @@ bool            firstFrame = true;
 Shader          glowShader;
 RenderTexture2D vectorTarget;
 RenderTexture2D processingTarget;
-Rectangle       textureRect {0, 0, 0, 0}; //screenWidth, -screenHeight};
+Rectangle       textureRect {0, 0, 0, 0};
 Rectangle       renderRect {0, 0, 0, 0};
 TestGame        game;
 Vector2         topLeft {0, 0};
 double          totalTime;
 #ifdef GLOW
-bool            glow = true;
+bool glow = true;
 #else
-bool            glow = false;
+bool glow = false;
 #endif
 
 #ifdef DRAW_PIXELS
@@ -45,6 +45,7 @@ int      axisUniform;
 int      texture1Location;
 int      xsUniform;
 int      ysUniform;
+int      orgW, orgH;
 
 const int zero = 0;
 const int one  = 1;
@@ -53,13 +54,9 @@ void UpdateDrawFrame(void);
 
 void UpdateRenderSize(Rectangle& renderRect)
 {
-#if defined(PLATFORM_WEB)
-    int viewportWidth  = 1856;
-    int viewportHeight = 1044;
-#else
     auto viewportWidth  = GetScreenWidth();
     auto viewportHeight = GetScreenHeight();
-#endif
+
     renderRect.width  = viewportWidth;
     renderRect.height = viewportHeight;
     if(renderRect.width * aspectV != renderRect.height * aspectH)
@@ -94,23 +91,26 @@ void UpdateRenderSize(Rectangle& renderRect)
     textureRect.width  = renderRect.width;
     textureRect.height = -renderRect.height;
 
-    camera.zoom = renderRect.height / 2;
+    camera.zoom     = (renderRect.height / 2) / 9.0f;
     camera.offset   = (Vector2) {renderRect.width / 2, renderRect.height / 2};
     camera.rotation = 0;
 
-    thick = 0.008f / (renderRect.height / 1000.0f);
+    thick = thickFactor  / (renderRect.height / 1000.0f);
 
     float oneOverWidth  = 1 / renderRect.width;
     float oneOverHeight = 1 / renderRect.height;
 
     SetShaderValue(glowShader, xsUniform, &oneOverWidth, SHADER_UNIFORM_FLOAT);
     SetShaderValue(glowShader, ysUniform, &oneOverHeight, SHADER_UNIFORM_FLOAT);
+
+    game.Render(thick);
 }
 
 int main()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, WINDOW_TITLE);
+    SetWindowState(FLAG_VSYNC_HINT);
     InitAudioDevice();
     SetWindowMinSize(screenWidth / 4, screenHeight / 4);
     glowShader   = LoadShader(0, TextFormat(SHADER_PATH, GLSL_VERSION));
@@ -121,6 +121,9 @@ int main()
     xsUniform        = GetShaderLocation(glowShader, "xs");
     ysUniform        = GetShaderLocation(glowShader, "ys");
     texture1Location = GetShaderLocation(glowShader, "texture1");
+
+    game.Load();
+
     UpdateRenderSize(renderRect);
 
     /*
@@ -158,7 +161,22 @@ void UpdateDrawFrame()
 #if defined(PLATFORM_DESKTOP)
     if(IsKeyPressed(FULLSCREEN_KEY))
     {
-        ToggleFullscreen();
+        if(IsWindowFullscreen())
+        {
+            ToggleFullscreen();
+            SetWindowSize(orgW, orgH);
+        }
+        else
+        {
+            orgW   = GetScreenWidth();
+            orgH   = GetScreenHeight();
+            auto m = GetCurrentMonitor();
+            auto w = GetMonitorWidth(m);
+            auto h = GetMonitorHeight(m);
+            SetWindowSize(w, h);
+            ToggleFullscreen();
+        }
+
         UpdateRenderSize(renderRect);
     }
 #endif
@@ -169,8 +187,8 @@ void UpdateDrawFrame()
         glow = !glow;
     }
 
-    game.m_mouseX = (GetMouseX() - renderRect.width / 2) / (renderRect.height / 2);
-    game.m_mouseY = (GetMouseY() - renderRect.height / 2) / (renderRect.height / 2);
+    game.m_mouseX = 9 * (GetMouseX() - renderRect.width / 2) / (renderRect.height / 2);
+    game.m_mouseY = 9 * (GetMouseY() - renderRect.height / 2) / (renderRect.height / 2);
 
     auto currentTime = GetTime();
     game.Tick(currentTime - totalTime, currentTime);
@@ -179,10 +197,7 @@ void UpdateDrawFrame()
     BeginDrawing();
     {
         bool windowResized = IsWindowResized();
-#if defined(PLATFORM_WEB)
-        windowResized = false;
-#endif
-        if(windowResized || firstFrame)
+        if(windowResized)
         {
             UpdateRenderSize(renderRect);
         }

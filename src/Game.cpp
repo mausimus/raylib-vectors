@@ -6,7 +6,7 @@
 
 Game::Game() : m_activeScreen {nullptr}, m_frameCounter {}, m_mouseX {}, m_mouseY {} { }
 
-void Game::LoadScreens()
+void Game::Load()
 {
     m_assets = new Assets();
     m_assets->Load();
@@ -21,7 +21,6 @@ void Game::LoadScreens()
 
 void Game::Start()
 {
-    LoadScreens();
     SwitchScreen(0);
 }
 
@@ -37,6 +36,11 @@ void Game::End()
     }
 
     m_assets->Unload();
+}
+
+void Game::Render(float thick)
+{
+    m_assets->Render(thick);
 }
 
 void Game::Tick(double deltaTime, double totalTime)

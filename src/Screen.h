@@ -10,7 +10,7 @@ protected:
     VectorBatch m_vectorBatch;
     VectorObject m_mouseCursor;
 
-    void DrawText(const std::string& text, float x, float y, Color c);
+    void DrawText(const std::string& text, float x, float y, Color c, int hAlign = 0, int vAlign = 0);
 
     inline Assets* Assets() { return m_game->m_assets; }
 

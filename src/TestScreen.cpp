@@ -88,12 +88,20 @@ void TestScreen::DrawVectors()
 {
     auto time = (float)sin(GetTime() / 4);
     m_vectorBatch.DrawObject(rect, (Vector2) {0, 0}, time * 180, LIME);
-    m_vectorBatch.DrawObject(tri, (Vector2) {-0.5f, 0}, time * 180, YELLOW);
+    m_vectorBatch.DrawObject(tri, (Vector2) {1.5f, 0.5f}, time * 180, YELLOW);
     m_vectorBatch.DrawObject(circ, (Vector2) {0.5f, -0.5f}, 0, PINK);
 
     m_vectorBatch.DrawObject(map, (Vector2) {0, 0}, time * 20, RAYWHITE);
 
     DrawText("RAYLIB VECTORS", -1.7f, -0.8f, RAYWHITE);
 
-    DrawText("ABCDEFGHIJKLMNOPQRSTUVXYZ0123456789.,;:!@#$%^&*()-=+_/?<>[]{}\\`", -1.0f, 0.5f, GREEN);
+    DrawText("ABCDEFGHIJKLMNOPQRSTUVXYZ0123456789.,;:!@#$%^&*()-=+_/\\?<>[]{}\\`udlr", -1.0f, 0.5f, GREEN);
+
+    auto fps = GetFPS();
+
+    DrawText(std::to_string(fps), -16, -9, BLUE, -1, -1);
+    DrawText(std::to_string(fps), 16, 9, BLUE, 1, 1);
+    DrawText(std::to_string(fps), 16, -9, BLUE, 1, -1);
+    DrawText(std::to_string(fps), -16, 9, BLUE, -1, 1);
+    DrawText(std::to_string(fps), 0, 0, BLUE, 0, 0);
 }

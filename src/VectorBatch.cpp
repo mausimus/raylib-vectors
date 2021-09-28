@@ -106,9 +106,6 @@ void VectorObject::Render(float thick)
 
 void VectorObject::Draw(Color color)
 {
-    rlDrawRenderBatchActive();
-    rlBegin(RL_TRIANGLES);
-
     if(solids.size())
     {
         if(rlCheckRenderBatchLimit(solids.size()))
@@ -124,7 +121,6 @@ void VectorObject::Draw(Color color)
         }
     }
 
-    //rlCheckRenderBatchLimit(BATCH_SIZE);
     unsigned bc = BATCH_SIZE;
     for(unsigned i = 0; i < vertices.size(); i++)
     {
@@ -141,10 +137,6 @@ void VectorObject::Draw(Color color)
         rlColor4ub(color.r, color.g, color.b, color.a);
         rlVertex3f(vertices[i].x, vertices[i].y, lengths[i]);
     }
-
-    //rlDrawRenderBatchActive();
-    rlBegin(RL_TRIANGLES);
-    //rlEnd();
 }
 
 void VectorObject::moveTo(double x, double y)
@@ -304,6 +296,6 @@ void VectorBatch::Thick(float thick)
 
 void VectorBatch::End()
 {
-    //rlEnd();
+    rlEnd();
     rlSetBlendMode(BLEND_ALPHA);
 }
