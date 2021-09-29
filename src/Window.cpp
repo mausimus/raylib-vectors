@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TestGame.h"
+#include "utils.h"
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -52,10 +53,20 @@ const int one  = 1;
 
 void UpdateDrawFrame(void);
 
+int pw, ph;
+
 void UpdateRenderSize(Rectangle& renderRect)
 {
     auto viewportWidth  = GetScreenWidth();
     auto viewportHeight = GetScreenHeight();
+
+    if(pw == viewportWidth && ph == viewportHeight)
+        return;
+
+    TraceLog(LOG_WARNING, "UpdateRenderSize %d %d", viewportWidth, viewportHeight);
+
+    pw = viewportWidth;
+    ph = viewportHeight;
 
     renderRect.width  = viewportWidth;
     renderRect.height = viewportHeight;
@@ -95,7 +106,7 @@ void UpdateRenderSize(Rectangle& renderRect)
     camera.offset   = (Vector2) {renderRect.width / 2, renderRect.height / 2};
     camera.rotation = 0;
 
-    thick = thickFactor  / (renderRect.height / 1000.0f);
+    thick = thickFactor / (renderRect.height / 1000.0f);
 
     float oneOverWidth  = 1 / renderRect.width;
     float oneOverHeight = 1 / renderRect.height;
@@ -158,9 +169,11 @@ int main()
 void UpdateDrawFrame()
 {
 #ifdef FULLSCREEN_KEY
-#if defined(PLATFORM_DESKTOP)
     if(IsKeyPressed(FULLSCREEN_KEY))
     {
+#if defined(PLATFORM_WEB)
+//        ToggleFullscreen();
+#else
         if(IsWindowFullscreen())
         {
             ToggleFullscreen();
@@ -178,8 +191,8 @@ void UpdateDrawFrame()
         }
 
         UpdateRenderSize(renderRect);
-    }
 #endif
+    }
 #endif
 
     if(IsKeyPressed(KEY_THREE))
@@ -194,13 +207,14 @@ void UpdateDrawFrame()
     game.Tick(currentTime - totalTime, currentTime);
     totalTime = currentTime;
 
+    bool windowResized = IsWindowResized();
+    if(windowResized)
+    {
+        UpdateRenderSize(renderRect);
+    }
+
     BeginDrawing();
     {
-        bool windowResized = IsWindowResized();
-        if(windowResized)
-        {
-            UpdateRenderSize(renderRect);
-        }
 
 #ifdef DRAW_BACKGROUND
         BeginTextureMode(vectorTarget);
@@ -220,7 +234,7 @@ void UpdateDrawFrame()
 
 #ifdef DRAW_SHAPES
         BeginTextureMode(vectorTarget);
-        ClearBackground(BLACK);
+        ClearBackground(DARKGRAY);
         BeginMode2D(camera);
         BeginShaderMode(vectorShader);
         game.DrawVectors(thick);
@@ -234,7 +248,7 @@ void UpdateDrawFrame()
             BeginTextureMode(processingTarget);
             BeginShaderMode(glowShader);
             SetShaderValue(glowShader, axisUniform, &zero, SHADER_UNIFORM_INT);
-            ClearBackground(BLACK);
+            ClearBackground(DARKGRAY);
             DrawTexturePro(
                 vectorTarget.texture, textureRect, (Rectangle) {0, 0, textureRect.width, -textureRect.height}, (Vector2) {0, 0}, 0, WHITE);
             EndShaderMode();
@@ -245,7 +259,7 @@ void UpdateDrawFrame()
             SetShaderValueTexture(glowShader, texture1Location, vectorTarget.texture);
             if(windowResized || firstFrame)
             {
-                ClearBackground(BLACK);
+                ClearBackground(DARKGRAY);
                 firstFrame = false;
             }
             DrawTexturePro(processingTarget.texture, textureRect, renderRect, topLeft, 0, WHITE);
@@ -255,11 +269,11 @@ void UpdateDrawFrame()
         {
             if(windowResized || firstFrame)
             {
-                ClearBackground(BLACK);
+                ClearBackground(DARKGRAY);
                 firstFrame = false;
             }
             DrawTexturePro(vectorTarget.texture, textureRect, renderRect, topLeft, 0, WHITE);
         }
+        EndDrawing();
     }
-    EndDrawing();
 }

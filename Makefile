@@ -25,8 +25,7 @@
 
 # Define required raylib variables
 PROJECT_NAME       ?= game
-RAYLIB_VERSION     ?= 3.5.0
-RAYLIB_API_VERSION ?= 350
+RAYLIB_VERSION     ?= 3.8.0
 RAYLIB_PATH        ?= c:/raylib/raylib
 
 # Define compiler path on Windows
@@ -46,7 +45,6 @@ PLATFORM           ?= PLATFORM_DESKTOP
 # the library at EXAMPLE_RUNTIME_PATH, if present, will take precedence over the one at RAYLIB_INSTALL_PATH.
 # RAYLIB_INSTALL_PATH should be the desired full path to libraylib. No relative paths.
 #DESTDIR ?= /usr/local
-#DESTDIR = C:/repo/raylib-template
 RAYLIB_INSTALL_PATH ?= $(DESTDIR)/lib
 # RAYLIB_H_INSTALL_PATH locates the installed raylib header and associated source files.
 RAYLIB_H_INSTALL_PATH ?= $(DESTDIR)/include
@@ -124,7 +122,7 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
     CLANG_PATH          = $(EMSDK_PATH)/upstream/bin
     PYTHON_PATH         = $(EMSDK_PATH)/python/3.9.2-1_64bit
     NODE_PATH           = $(EMSDK_PATH)/node/14.15.5_64bit/bin
-    export PATH         = $(EMSDK_PATH);$(EMSCRIPTEN_PATH);$(CLANG_PATH);$(NODE_PATH);$(PYTHON_PATH);C:\raylib\MinGW\bin:$$(PATH)
+    export PATH         = $(EMSDK_PATH);$(EMSCRIPTEN_PATH);$(CLANG_PATH);$(NODE_PATH);$(PYTHON_PATH);C:\raylib\MinGW\bin:$$(PATH) 
 endif
 
 # Define raylib release directory for compiled library.
@@ -238,8 +236,8 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
     # -s ASSERTIONS=1            # enable runtime checks for common memory allocation errors (-O1 and above turn it off)
     # --profiling                # include information for code profiling
     # --memory-init-file 0       # to avoid an external memory initialization code file (.mem)
-    # --preload-file resources   # specify a resources folder for data compilation # 16777216 -s ASSERTIONS=1
-    CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=33554432 --preload-file resources 
+    # --preload-file resources   # specify a resources folder for data compilation
+    CFLAGS += -Os -s USE_GLFW=3 -s TOTAL_MEMORY=33554432 -s ASSERTIONS=1 -s LLD_REPORT_UNDEFINED --preload-file resources
     ifeq ($(BUILD_MODE), DEBUG)
         CFLAGS += -s ASSERTIONS=1 --profiling
     endif

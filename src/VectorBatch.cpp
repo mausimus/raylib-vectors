@@ -108,10 +108,7 @@ void VectorObject::Draw(Color color)
 {
     if(solids.size())
     {
-        if(rlCheckRenderBatchLimit(solids.size()))
-        {
-            rlBegin(RL_TRIANGLES);
-        }
+        rlCheckRenderBatchLimit(solids.size());
 
         for(unsigned i = 0; i < solids.size(); i++)
         {
@@ -126,10 +123,7 @@ void VectorObject::Draw(Color color)
     {
         if(bc++ == BATCH_SIZE)
         {
-            if(rlCheckRenderBatchLimit(BATCH_SIZE))
-            {
-                rlBegin(RL_TRIANGLES);
-            }
+            rlCheckRenderBatchLimit(BATCH_SIZE);
             bc = 0;
         }
         const auto& tc = texCoords[i % 6];
